@@ -1,0 +1,169 @@
+// Meal Planner 1.0
+
+import java.util.*;
+import java.io.*; //Imports the serializable package so that objects can be saved.
+
+//Help class that actually does everything.
+class MealHelper implements Serializable { //Lets the objects in this class be serialized
+	
+	private ArrayList<String> MealsList = new ArrayList<String>();
+	private static Scanner scanner = new Scanner( System.in );
+	
+	//Doing double spacing between methods to increase whitespace and to help readability.
+	//Main Menu
+	public void MainMenu() {
+		boolean exitMain = true; // Previously named "exitLoop", but there are going to be multiple loops.
+		/* Note the difference between =, ==, and string1.equals(string2).
+		= sets variables.
+		== checks Boolean equations
+		string1.equals(string2) checks strings character by character.
+		
+		Side note: true is a state. True is not.
+		*/
+		while (exitMain) { // The while loop checks the condition first, then executes. Do While loops execute then check the condition to see if they should continue.
+		// Note: while (exitMain == true) is the same as while (exitMain) or at least should be
+		/* 	Note: Ben noted that all Boolean values in Java default to true. As a result it would be easier to just put while (true) and put in 'break' when I want to exit.
+			I'm not sure if while (Boolean true) would create a boolean variable and set it to true by default. Would be worth testing. Otherwise the variable still has to be declared earlier
+			even if it gets set to true by default.
+		*/
+			System.out.println("Welcome to Meal Planner. Please enter the number of what you would like to do next.");
+			System.out.println("1 = Create new meal(s).");
+			System.out.println("2 = Display list of all meals.");
+			System.out.println("3 = Delete a meal.");
+			System.out.println("4 = Edit a meal.");
+			System.out.println("5 = Exit");
+			while(!scanner.hasNextInt()) { // Checks to make sure the input is an int.
+			/* 
+				.hasNext() gives a input for the user, but doesn't actually scan it. It's just checking true or false. ***Note that this is an input request INSIDE the while loop condition.
+				.hasNextInt() will give the user an input and check to see if it is an int.
+				The ! means opposite so the while loop keeps going while .hasNextInt is anything BUT an int.
+				the .next (as seen below) scans through the input, but ultimately ignores it. In short it's like saying "Yes I recognize you gave me an input, but I don't care what it is I'm just using it to get to the next input."	
+			*/
+				scanner.next();
+				System.out.println("That is not a valid input. Please try again.");
+			}
+			int userInput = scanner.nextInt();
+				/*Notes on this scanner:
+				1. It accepts input and changes it to an int.
+				2. It JUST reads the number and not the end of the line. This can throw off upcoming inpus.
+				3. The Int part can be substituted for Double or Float etc.
+				*/
+			String sentence = scanner.nextLine(); //Used to read the remainder of the line after a scanner.nextInt(); . Feel like there should be a better variable name, but it works ok in this case.
+			if (userInput == 1) {
+				Create();
+			}
+			else if (userInput == 2) {
+				Read();
+			}
+			else if (userInput == 3) {
+				Delete();
+			}
+			else if (userInput == 4) {
+				Edit();
+			}
+			else if (userInput == 5) {
+				exitMain = false;
+			}
+			else {
+				System.out.println("That is not a valid input. Please try again.");
+			} // Close if
+		}// Close while
+	} // Close Method
+	
+	
+	//Adds new meals to MealList. Currently for testing, meals are just Strings
+	//Also needs to check for redundant names in the future.
+	public void Create() {
+		System.out.println(); // Should be the same as System.out.println(" ")
+		System.out.println("Please type the name of the meal you wish to add.");
+		String name = scanner.nextLine(); //scan.next doesn't read spaces. This will read the entire line allowing for spaces.
+		MealsList.add(name);
+	}// Close method
+	
+	
+	//Displays Meals in MealList
+	public void Read() {
+		System.out.println();
+		for (int i = 0; i < MealsList.size(); i++) {
+			String name = MealsList.get(i); //Variable was previously Name, but variables should always start as lowercase. Static variables should be all uppercase.
+			System.out.println(name);
+		} // Close loop
+	} // Close method
+	
+	
+	//Removes a meal in MealList
+	public void Delete() {
+		System.out.println();
+		boolean empty = MealsList.isEmpty(); //Will return true if empy and false if it has something
+		if (empty) {
+			System.out.println("There are currently no meals to delete.");
+		}
+		else {
+			boolean exitDelete = true;
+			
+			while (exitDelete) {
+				System.out.println(); // Moved the whitespace and the Read before the instructions. The user may have to scroll to find the meal, but they should at least always know thier instructions
+				Read();
+				System.out.println("Please type the name of the meal you wish to delete. Alternatively type Exit to quit. Case matters.");
+				if (Name.equals("Exit")) {
+					exitDelete = false;
+				}
+				else {
+					boolean isIn = MealsList.contains(Name); // Searches the array list for Name
+					if (isIn) {
+						MealsList.remove(Name); // Removes Name from MealsList
+						System.out.println(Name + " has been removed.");
+					}
+					else {
+						System.out.println(Name + " could not be found. Please try again.");
+					} // Close if
+				}// Close if
+			}// Close loop
+		} // Close if
+	}// Close Method
+	
+	//Updates a meal in the MealList
+	//Note. In the future when meals have multiple variables, the Meal Object should have methods to set these and the Update method just calls those methods.
+	public void Edit() {
+		System.out.println();
+		boolean empty = MealsList.isEmpty(); //Will return true if empy and false if it has something
+		if (empty) {
+			System.out.println("There are currently no meals to edit.");
+		}
+		else {
+			boolean exitEdit = true;
+			
+			while (exitEdit == true) {
+				System.out.println("Please type the name of the meal you wish to edit. Alternatively type Exit to quit. Case matters.");
+				System.out.println(" ");
+				Read();
+				String Name = scanner.nextLine();
+				System.out.println(" ");
+				if (Name.equals("Exit")) {
+					exitEdit = false;
+				}
+				else {
+					boolean isIn = MealsList.contains(Name); // Searches the array list for Name
+					if (isIn == true) {
+						int idx = MealsList.indexOf(Name); // Finds the index of Name
+						System.out.println("Please type what you would like the name to be.");
+						Name = scanner.nextLine();
+						MealsList.set(idx, Name);
+					}
+					else {
+						System.out.println(Name + " could not be found. Please try again.");
+					} // Close if
+				}// Close if
+			}// Close loop
+		} // Close if
+	}// Close Method		
+}
+//Main Method.
+class MealPlanner {
+	public static void main (String[] args) {
+
+		MealHelper helper = new MealHelper();
+		
+		helper.MainMenu();
+	}
+}
