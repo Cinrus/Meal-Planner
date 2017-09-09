@@ -88,6 +88,7 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 			String name = MealsList.get(i); //Variable was previously Name, but variables should always start as lowercase. Static variables should be all uppercase.
 			System.out.println(name);
 		} // Close loop
+		System.out.println();
 	} // Close method
 	
 	
@@ -101,21 +102,21 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 		else {
 			boolean exitDelete = true;
 			
-			while (exitDelete) {
-				System.out.println(); // Moved the whitespace and the Read before the instructions. The user may have to scroll to find the meal, but they should at least always know thier instructions
+			while (exitDelete) { //Won't run without exitDelete being specifically initialized.
 				Read();
 				System.out.println("Please type the name of the meal you wish to delete. Alternatively type Exit to quit. Case matters.");
-				if (Name.equals("Exit")) {
+				String name = scanner.nextLine();
+				if (name.equals("Exit")) {
 					exitDelete = false;
 				}
 				else {
-					boolean isIn = MealsList.contains(Name); // Searches the array list for Name
+					boolean isIn = MealsList.contains(name); // Searches the array list for Name
 					if (isIn) {
-						MealsList.remove(Name); // Removes Name from MealsList
-						System.out.println(Name + " has been removed.");
+						MealsList.remove(name); // Removes Name from MealsList
+						System.out.println(name + " has been removed.");
 					}
 					else {
-						System.out.println(Name + " could not be found. Please try again.");
+						System.out.println(name + " could not be found. Please try again.");
 					} // Close if
 				}// Close if
 			}// Close loop
@@ -133,25 +134,23 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 		else {
 			boolean exitEdit = true;
 			
-			while (exitEdit == true) {
-				System.out.println("Please type the name of the meal you wish to edit. Alternatively type Exit to quit. Case matters.");
-				System.out.println(" ");
+			while (exitEdit) {
 				Read();
-				String Name = scanner.nextLine();
-				System.out.println(" ");
-				if (Name.equals("Exit")) {
+				System.out.println("Please type the name of the meal you wish to edit. Alternatively type Exit to quit. Case matters.");
+				String name = scanner.nextLine();
+				if (name.equals("Exit")) {
 					exitEdit = false;
 				}
 				else {
-					boolean isIn = MealsList.contains(Name); // Searches the array list for Name
+					boolean isIn = MealsList.contains(name); // Searches the array list for Name
 					if (isIn == true) {
-						int idx = MealsList.indexOf(Name); // Finds the index of Name
+						int idx = MealsList.indexOf(name); // Finds the index of Name
 						System.out.println("Please type what you would like the name to be.");
-						Name = scanner.nextLine();
-						MealsList.set(idx, Name);
+						name = scanner.nextLine();
+						MealsList.set(idx, name);
 					}
 					else {
-						System.out.println(Name + " could not be found. Please try again.");
+						System.out.println(name + " could not be found. Please try again.");
 					} // Close if
 				}// Close if
 			}// Close loop
