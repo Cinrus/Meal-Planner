@@ -2,12 +2,51 @@
 
 import java.util.*;
 import java.io.*; //Imports the serializable package so that objects can be saved.
+import java.lang.*; //Imports the .isEmpty among other things.
+
+//Meal Class
+class Meal implements Serializable {
+	Scanner scanner = new Scanner(System.in);
+	private String name;
+	
+	public String getName() {
+		return name;
+	}//Close Method
+		
+	public void setName(String n) {
+		name = n;
+	}//Close method
+}
 
 //Help class that actually does everything.
 class MealHelper implements Serializable { //Lets the objects in this class be serialized
 	
-	private ArrayList<String> MealsList = new ArrayList<String>();
-	private static Scanner scanner = new Scanner( System.in );
+	private ArrayList<Meal> MealsList = new ArrayList<Meal>();
+	private static Scanner scanner = new Scanner(System.in);
+	
+		//Checks names for valid inputs and duplicates
+	public String/*Returns String*/ CheckName() {
+		boolean exitCheckName = true;
+		Meal m;
+		String input = "";
+		while (exitCheckName) {
+			System.out.println("Please type the name you want the meal to have.");
+			input = scanner.nextLine();
+			if (input.length() == 0) { //because .isEmpty isn't working
+				System.out.println("That is not a valid name.");
+				continue;
+			} //end if
+			for (int i = 0; i < MealsList.size(); i++) {
+				m = MealsList.get(i);
+				if (m.getName() == input) {
+					System.out.println("That name is already taken.");
+					continue;
+				} //Close if
+			} //Close loop
+			break;
+		} //Close loop
+		return input;
+	} //Close method
 	
 	//Doing double spacing between methods to increase whitespace and to help readability.
 	//Main Menu
@@ -54,13 +93,13 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 			}
 			else if (userInput == 2) {
 				Read();
-			}
+			}/*
 			else if (userInput == 3) {
 				Delete();
 			}
 			else if (userInput == 4) {
 				Edit();
-			}
+			}*/
 			else if (userInput == 5) {
 				exitMain = false;
 			}
@@ -74,24 +113,28 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 	//Adds new meals to MealList. Currently for testing, meals are just Strings
 	//Also needs to check for redundant names in the future.
 	public void Create() {
-		System.out.println(); // Should be the same as System.out.println(" ")
-		System.out.println("Please type the name of the meal you wish to add.");
-		String name = scanner.nextLine(); //scan.next doesn't read spaces. This will read the entire line allowing for spaces.
-		MealsList.add(name);
+		String name = this.CheckName();
+		Meal newMeal = new Meal();
+		newMeal.setName(name);
+		MealsList.add(newMeal);
+		//Save();
 	}// Close method
 	
 	
 	//Displays Meals in MealList
 	public void Read() {
 		System.out.println();
+		Meal m;
+		String name;
 		for (int i = 0; i < MealsList.size(); i++) {
-			String name = MealsList.get(i); //Variable was previously Name, but variables should always start as lowercase. Static variables should be all uppercase.
-			System.out.println(name);
+			m = MealsList.get(i);
+			name = m.getName(); //Variable was previously Name, but variables should always start as lowercase. Static variables should be all uppercase.
+			System.out.println(i+1 + ". " + name);
 		} // Close loop
 		System.out.println();
 	} // Close method
 	
-	
+	/*
 	//Removes a meal in MealList
 	public void Delete() {
 		System.out.println();
@@ -122,7 +165,9 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 			}// Close loop
 		} // Close if
 	}// Close Method
+	*/
 	
+	/*
 	//Updates a meal in the MealList
 	//Note. In the future when meals have multiple variables, the Meal Object should have methods to set these and the Update method just calls those methods.
 	public void Edit() {
@@ -155,8 +200,12 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 				}// Close if
 			}// Close loop
 		} // Close if
-	}// Close Method		
-}
+	}// Close Method	
+*/	
+
+
+} //Close class
+	
 //Main Method.
 class MealPlanner {
 	public static void main (String[] args) {
@@ -166,3 +215,4 @@ class MealPlanner {
 		helper.MainMenu();
 	}
 }
+
