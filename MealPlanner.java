@@ -37,8 +37,8 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 				continue;
 			} //end if
 			for (int i = 0; i < MealsList.size(); i++) {
-				m = MealsList.get(i);
-				if (m.getName() == input) {
+				m = MealsList.get(i); //Note: MealsList.get(i).getName() should work
+				if (m.getName().equals(input)) { //When compairing strings you want to use XXX.equals(???)
 					System.out.println("That name is already taken.");
 					continue;
 				} //Close if
@@ -134,10 +134,60 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 		System.out.println();
 	} // Close method
 	
-	/*
+	
 	//Removes a meal in MealList
 	public void Delete() {
-		System.out.println();
+		boolean empty = MealsList.isEmpty(); //Will return true if empy and false if it has something
+		if (empty) {
+			System.out.println("There are currently no meals to delete.");
+		} //End if
+		else {
+			Read();
+			boolean deleteLoop = true;
+			while (deleteLoop) {
+				System.out.println("Please type the number next to the meal you wish to delete, or type Exit to quit.");
+				String input = scanner.nextLine();
+				if (input.equals("Exit") || input.equals("exit")) {
+					break;
+				}//End if
+				else {
+					try {
+					int i = Integer.parseInt(input); //wraps 
+					}//End try
+					catch (NumberFormatException exception){ //(InputMismatchException exception){
+						System.out.println("Please type a valid integer or Exit.");
+						continue;
+						// The idea is that it tries to convert input into an int (i). If it fails it brings up a message and skips to the next iteration of the loop.
+					} //End catch
+					if (i > MealsList.size + 1 || i < MealsList.size + 1) {
+						System.out.println("That was not a valid input.");
+						continue;
+					} //End if
+					else {
+						System.out.println("You are about to delete " + MealsList.get(i).getName()); //This should use the getName method from the object located at in
+						System.out.println("Would you like to continue? Y/N");
+						input = scanner.nextLine();
+						boolean ynLoop = true;
+						while (ynLoop) {
+							if (input.equals("N") || input.equals("n") || input.equals("No") || input.equals("no")) {
+								break;
+							} //End if
+							else if (input.equals("Y") || input.equals("y") || input.equals("Yes") || input.equals("yes")) {
+								MealsList.remove(i);
+								break;
+							} // End else if
+							else {
+								System.out.println("That is not a valid input.");
+							} //End else
+						} // End loop
+					} //End else
+				} //End else
+			} // End loop
+		} // End else
+	}// End method
+				
+				
+		/*
 		boolean empty = MealsList.isEmpty(); //Will return true if empy and false if it has something
 		if (empty) {
 			System.out.println("There are currently no meals to delete.");
@@ -166,6 +216,7 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 		} // Close if
 	}// Close Method
 	*/
+
 	
 	/*
 	//Updates a meal in the MealList
