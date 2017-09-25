@@ -1,4 +1,4 @@
-// Meal Planner 1.0
+// Meal Planner 2.1
 
 import java.util.*;
 import java.io.*; //Imports the serializable package so that objects can be saved.
@@ -6,7 +6,6 @@ import java.lang.*; //Imports the .isEmpty among other things.
 
 //Meal Class
 class Meal implements Serializable {
-	Scanner scanner = new Scanner(System.in);
 	private String name;
 	
 	public String getName() {
@@ -24,30 +23,25 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 	private ArrayList<Meal> MealsList = new ArrayList<Meal>();
 	private static Scanner scanner = new Scanner(System.in);
 	
-		//Checks names for valid inputs and duplicates
-	public String/*Returns String*/ CheckName() {
-		boolean invalidName = true;
-		Meal m;
-		String input = "";
-		while (invalidName) {
-			invalidName = false;
-			System.out.println("Please type the name you want the meal to have.");
-			input = scanner.nextLine();
-			if (input.length() == 0) { //because .isEmpty isn't working
-				System.out.println("That is not a valid name.");
-				invalidName = true;
-				continue;
-			} //end if
-			for (int i = 0; i < MealsList.size(); i++) {
-				m = MealsList.get(i); //Note: MealsList.get(i).getName() should work
-				if (m.getName().equals(input)) { //When compairing strings you want to use XXX.equals(???)
-					System.out.println("That name is already taken.");
-					invalidName = true;
-				} // Close if
-			} //Close loop
-		} //Close loop
-		return input;
-	} //Close method
+	//Method searches for and automatically loads an existing MealsList array list.
+	public void StartUp() {
+		File savedMeals = new File("C:\\Java\\Meal Planner\\MealSaves.ser");
+		if(savedMeals.exists() && !savedMeals.isDirectory()) { 
+			try {
+				FileInputStream fileStream = new FileInputStream("MealSaves.ser");
+				ObjectInputStream nos = new ObjectInputStream(fileStream);
+				Object one = nos.readObject(); // Holds the read obect
+				MealsList = (ArrayList<>) one; //Casts the object as an Array List of Meals and puts it in the MealsList variable.
+				nos.close(); // Closing the file input stream
+			}// End try
+			catch (Exception ex) {
+					ex.printStackTrace();
+			}// End catch
+		} //End if
+		MainMenu();
+	} // End method
+
+	
 	
 	//Doing double spacing between methods to increase whitespace and to help readability.
 	//Main Menu
@@ -97,10 +91,10 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 			}
 			else if (userInput == 3) {
 				Delete();
-			}/*
+			}
 			else if (userInput == 4) {
 				Edit();
-			}*/
+			}
 			else if (userInput == 5) {
 				exitMain = false;
 			}
@@ -111,6 +105,7 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 	} // Close Method
 	
 	
+	
 	//Adds new meals to MealList. Currently for testing, meals are just Strings
 	//Also needs to check for redundant names in the future.
 	public void Create() {
@@ -118,8 +113,9 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 		Meal newMeal = new Meal();
 		newMeal.setName(name);
 		MealsList.add(newMeal);
-		//Save();
+		Save();
 	}// Close method
+	
 	
 	
 	//Displays Meals in MealList
@@ -141,6 +137,7 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 	} // Close method
 	
 	
+	
 	//Removes a meal in MealList
 	public void Delete() {
 		boolean empty = MealsList.isEmpty(); //Will return true if empy and false if it has something
@@ -148,9 +145,9 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 			System.out.println("There are currently no meals to delete.");
 		} //End if
 		else {
-			Read();
 			boolean deleteLoop = true;
 			while (deleteLoop) {
+				Read();
 				System.out.println("Please type the number next to the meal you wish to delete, or type Exit to quit.");
 				String input = scanner.nextLine();
 				if (input.equals("Exit") || input.equals("exit")) {
@@ -161,7 +158,7 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 					try {
 					i = Integer.parseInt(input); //wraps the input into an int
 					}//End try
-					catch (NumberFormatException exception){ //(InputMismatchException exception){
+					catch (NumberFormatException exception){
 						System.out.println("Please type a valid integer or Exit.");
 						continue;
 						// The idea is that it tries to convert input into an int (i). If it fails it brings up a message and skips to the next iteration of the loop.
@@ -181,6 +178,8 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 							} //End if
 							else if (input.equals("Y") || input.equals("y") || input.equals("Yes") || input.equals("yes")) {
 								MealsList.remove(i - 1); //Remember: i is based on the absolute size of the array list. Since the array list index starts at 0 the index you want to pull from is actually one less than i.
+								Save();
+								Read();
 								break;
 							} // End else if
 							else {
@@ -192,85 +191,116 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 			} // End loop
 		} // End else
 	}// End method
-				
-				
-		/*
-		boolean empty = MealsList.isEmpty(); //Will return true if empy and false if it has something
-		if (empty) {
-			System.out.println("There are currently no meals to delete.");
-		}
-		else {
-			boolean exitDelete = true;
-			
-			while (exitDelete) { //Won't run without exitDelete being specifically initialized.
-				Read();
-				System.out.println("Please type the name of the meal you wish to delete. Alternatively type Exit to quit. Case matters.");
-				String name = scanner.nextLine();
-				if (name.equals("Exit")) {
-					exitDelete = false;
-				}
-				else {
-					boolean isIn = MealsList.contains(name); // Searches the array list for Name
-					if (isIn) {
-						MealsList.remove(name); // Removes Name from MealsList
-						System.out.println(name + " has been removed.");
-					}
-					else {
-						System.out.println(name + " could not be found. Please try again.");
-					} // Close if
-				}// Close if
-			}// Close loop
-		} // Close if
-	}// Close Method
-	*/
 
 	
-	/*
+
 	//Updates a meal in the MealList
 	//Note. In the future when meals have multiple variables, the Meal Object should have methods to set these and the Update method just calls those methods.
 	public void Edit() {
-		System.out.println();
 		boolean empty = MealsList.isEmpty(); //Will return true if empy and false if it has something
 		if (empty) {
 			System.out.println("There are currently no meals to edit.");
-		}
+		} //End if
 		else {
-			boolean exitEdit = true;
-			
-			while (exitEdit) {
-				Read();
-				System.out.println("Please type the name of the meal you wish to edit. Alternatively type Exit to quit. Case matters.");
-				String name = scanner.nextLine();
-				if (name.equals("Exit")) {
-					exitEdit = false;
-				}
+			boolean editLoop = true;
+			Read();
+			while (editLoop) {
+				System.out.println("Please type the number next to the meal you wish to edit, or type Exit to quit.");
+				String input = scanner.nextLine();
+				if (input.equals("Exit") || input.equals("exit")) {
+					break;
+				}//End if
 				else {
-					boolean isIn = MealsList.contains(name); // Searches the array list for Name
-					if (isIn == true) {
-						int idx = MealsList.indexOf(name); // Finds the index of Name
-						System.out.println("Please type what you would like the name to be.");
-						name = scanner.nextLine();
-						MealsList.set(idx, name);
-					}
+					int i;
+					try {
+					i = Integer.parseInt(input); //wraps the input into an int
+					}//End try
+					catch (NumberFormatException exception){
+						System.out.println("Please type a valid integer or Exit.");
+						continue;
+						// The idea is that it tries to convert input into an int (i). If it fails it brings up a message and skips to the next iteration of the loop.
+					} //End catch
+					if (i > MealsList.size() || i < 1) {
+						System.out.println("That was not a valid input.");
+						continue;
+					} //End if
 					else {
-						System.out.println(name + " could not be found. Please try again.");
-					} // Close if
-				}// Close if
-			}// Close loop
-		} // Close if
-	}// Close Method	
-*/	
+						System.out.println("You are about to edit " + MealsList.get(i - 1).getName()); //This should use the getName method from the object located at in
+						System.out.println("Would you like to continue? Y/N");
+						input = scanner.nextLine();
+						boolean ynLoop = true;
+						while (ynLoop) {
+							if (input.equals("N") || input.equals("n") || input.equals("No") || input.equals("no")) {
+								break;
+							} //End if
+							else if (input.equals("Y") || input.equals("y") || input.equals("Yes") || input.equals("yes")) {
+								String name = this.CheckName();
+								MealsList.get(i - 1).setName(name); //Sets the name of the object in the array list. This is important to remember.
+								Save();
+								Read();
+								break;
+							} // End else if
+							else {
+								System.out.println("That is not a valid input.");
+							} //End else
+						} // End loop
+					} //End else
+				} //End else
+			} // End loop
+		} // End else
+	}// End method
 
 
+
+	//Save method
+	public void Save() {
+		try {
+			FileOutputStream fs = new FileOutputStream("MealSaves.ser");
+			ObjectOutputStream os = new ObjectOutputStream(fs);
+			os.writeObject(MealsList);
+			os.close();
+		} //End try
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}//End catch
+	}//End method
+
+	
+	//Checks names for valid inputs and duplicates
+	public String/*Returns String*/ CheckName() {
+		boolean invalidName = true;
+		Meal m;
+		String input = "";
+		while (invalidName) {
+			invalidName = false;
+			System.out.println("Please type the name you want the meal to have.");
+			input = scanner.nextLine();
+			if (input.length() == 0) { //because .isEmpty isn't working
+				System.out.println("That is not a valid name.");
+				invalidName = true;
+				continue;
+			} //end if
+			for (int i = 0; i < MealsList.size(); i++) {
+				m = MealsList.get(i); //Note: MealsList.get(i).getName() should work
+				if (m.getName().equals(input)) { //When compairing strings you want to use XXX.equals(???)
+					System.out.println("That name is already taken.");
+					invalidName = true;
+				} // Close if
+			} //Close loop
+		} //Close loop
+		return input;
+	} //Close method
+	
+	
 } //Close class
 	
 //Main Method.
-class MealPlanner {
+class MealPlanner implements Serializable {
 	public static void main (String[] args) {
 
 		MealHelper helper = new MealHelper();
 		
-		helper.MainMenu();
+		helper.StartUp();
 	}
 }
 
