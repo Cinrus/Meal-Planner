@@ -1,4 +1,4 @@
-// Meal Planner 2.1
+// Meal Planner 2.2
 
 import java.util.*;
 import java.io.*; //Imports the serializable package so that objects can be saved.
@@ -24,6 +24,10 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 	private static Scanner scanner = new Scanner(System.in);
 	
 	//Method searches for and automatically loads an existing MealsList array list.
+	@SuppressWarnings("unchecked") 
+	/*Suppresses the warning for the line "MealsList = (ArrayList<Meal>) one;" The warning exists because the compiler can't ever be sure that the object being cast is an Meal type arraylist. 
+	As the object should ALWAYS be a Meal type arraylist and research has shown is no better way to write the code. As such a suppressed warning is called for. Testing at this stage 
+	(loading and saving method implamentation) has show that the code works exactly as desired despite the warning.*/
 	public void StartUp() {
 		File savedMeals = new File("C:\\Java\\Meal Planner\\MealSaves.ser");
 		if(savedMeals.exists() && !savedMeals.isDirectory()) { 
@@ -31,7 +35,7 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 				FileInputStream fileStream = new FileInputStream("MealSaves.ser");
 				ObjectInputStream nos = new ObjectInputStream(fileStream);
 				Object one = nos.readObject(); // Holds the read obect
-				MealsList = (ArrayList<>) one; //Casts the object as an Array List of Meals and puts it in the MealsList variable.
+				MealsList = (ArrayList<Meal>) one; //Casts the object as an Array List of Meals and puts it in the MealsList variable.
 				nos.close(); // Closing the file input stream
 			}// End try
 			catch (Exception ex) {
@@ -65,7 +69,8 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 			System.out.println("2 = Display list of all meals.");
 			System.out.println("3 = Delete a meal.");
 			System.out.println("4 = Edit a meal.");
-			System.out.println("5 = Exit");
+			System.out.println("5 = Create meal plan.");
+			System.out.println("6 = Exit");
 			while(!scanner.hasNextInt()) { // Checks to make sure the input is an int.
 			/* 
 				.hasNext() gives a input for the user, but doesn't actually scan it. It's just checking true or false. ***Note that this is an input request INSIDE the while loop condition.
@@ -96,6 +101,9 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 				Edit();
 			}
 			else if (userInput == 5) {
+				Random();
+			}
+			else if (userInput == 6) {
 				exitMain = false;
 			}
 			else {
@@ -250,6 +258,39 @@ class MealHelper implements Serializable { //Lets the objects in this class be s
 		} // End else
 	}// End method
 
+	//creates a randomized list of 7 meals with no duplicates
+	public void Random() {
+		int range = MealsList.size();
+		ArrayList<String> meals = new ArrayList<String>();
+		Meal m;
+		String name;
+		boolean invalidMeal = true;
+		boolean isIn;
+		
+		if (range < 7) {
+			System.out.println("There needs to be at least seven meals to choose from.");
+		}
+		else {
+			for (int i = 0; i < 7; i++) {
+				invalidMeal = true;
+				while (invalidMeal) {
+					int index = (int)(Math.random() * range);
+					m = MealsList.get(index);
+					name = m.getName();
+					if (isIn = meals.contains(name)) {
+						invalidMeal = true;
+					}
+					else {
+						invalidMeal = false;
+						meals.add(name);
+					} //End else
+				}//End while loop
+			}//End for loop
+			for (int i = 0; i < meals.size(); i++) {
+				System.out.println(meals.get(i));
+			} // Close loop
+		}// End else
+	}// End method
 
 
 	//Save method
