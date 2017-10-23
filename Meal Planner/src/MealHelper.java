@@ -61,6 +61,8 @@ public class MealHelper implements Serializable {
 			case 4: uibo.EditMeal(mlo);
 					pbo.Save(mlo);
 					break;
+			case 5: uibo.MealPlan(mlo);
+					break;
 			case 0: loop = false;
 					break;
 			default: uibo.GenericMessage("That is an invalid choice. Try again.");
