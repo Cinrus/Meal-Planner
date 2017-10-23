@@ -95,4 +95,25 @@ public class MealList implements Serializable {
 	public void LoadMealList(ArrayList<Meal> loadTemp) {
 		mealList = loadTemp;
 	}
+
+	//Creates an array list of meal names drawn from mealList. It uses mealAmmount to determine how big this array list should be.
+	//It then passes the array list back.
+	public ArrayList<String> CreateMealPlan(int mealAmmount) {
+		boolean invalidMeal = true;
+		ArrayList<String> meals = new ArrayList<String>();
+		
+		for (int i = 0; i < mealAmmount; i++) {
+			invalidMeal = true;
+			while (invalidMeal) {
+				int index = (int)(Math.random() * mealList.size());
+				Meal m = mealList.get(index);
+				String name = m.getName();
+				if (!meals.contains(name)) {
+					invalidMeal = false;
+					meals.add(name);
+				}
+			}
+		}
+		return meals;
+	}
 }

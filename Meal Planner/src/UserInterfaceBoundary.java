@@ -28,6 +28,7 @@ public class UserInterfaceBoundary implements Serializable {
 		System.out.println("2 = Display list of all meals.");
 		System.out.println("3 = Delete a meal.");
 		System.out.println("4 = Edit a meal.");
+		System.out.println("5 = Create a Meal Plan");
 		//System.out.println("5 = Create meal plan.");
 		System.out.println("0 = Exit");
 		while(!scanner.hasNextInt()) { // Checks to make sure the input is an int.
@@ -290,5 +291,53 @@ public class UserInterfaceBoundary implements Serializable {
 		}
 	}
 
+	/* Meal Plan method
+	 Display: How many meals would you like to plan for? Or type 0 to exit. (input = mealAmmount)
+	 	If 0: Break
+	 	If invalid input: Display: that is not a valid input. Please try again.
+	 	If !0 and valid input:
+	 		Check if mealAmmount > mealList
+	 			if Y: 
+	 				Display: There are not enough meals. Please choose a smaller number.
+	 			if N:
+	 				ArrayList<Meal> mealPlan = mlo's CreateMealPlan method passing mealAmmount
+					for (int i = 0; i <mealPlan.size(); i++) {
+						System.out.println(i + 1 + ". " + names.get(i));
+					}
+		System.out.println();
+	 */
+	
+	public void MealPlan(MealList mlo) {
+		while(true) {
+			System.out.println("Type how many meals you would like to plan for or type 0 to exit.");
+			while(!scanner.hasNextInt()) { // Checks to make sure the input is an int.
+				scanner.next();
+				System.out.println("That is not a valid input. Please try again.");
+			}
+			int mealAmmount = scanner.nextInt();
+			String sentence = scanner.nextLine(); //Used to read the remainder of the line after a scanner.nextInt(); . Feel like there should be a better variable name, but it works ok in this case.
+			if (mealAmmount == 0) {
+				break;
+			}
+			else if (mealAmmount < 0) {
+				System.out.println("There are no such things as negative meals. Try again.");
+			}
+			else {
+				if (mealAmmount > mlo.GetmealListSize()) {
+					System.out.println("There are not enough meals to make a meal list of that size.");
+				}
+				else {
+					ArrayList<String> mealPlan = mlo.CreateMealPlan(mealAmmount);
+					for (int i = 0; i <mealPlan.size(); i++) {
+						System.out.println(i + 1 + ". " + mealPlan.get(i));
+					}
+					System.out.println();
+					break;
+				}
+			}
+		}
+	}
+	
+	
 	
 }
