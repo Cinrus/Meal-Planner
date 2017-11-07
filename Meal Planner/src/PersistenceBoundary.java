@@ -1,33 +1,43 @@
 import java.io.*;
 import java.util.*;
 
+/*
+ This is the persistence boundary class. It's purpose is to act as an interface for saving and loading meal data.
+ Right now meal data is being saved as a document in a static location. In the future it could be saved to a location that
+ the user desires, or possibly even a database.
+ */
 public class PersistenceBoundary implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
+	public static final String MEALARRAYLOCATION = "C:\\Java\\Eclipse Workspace\\Meal Planner\\MealSaves.ser"; //Location saved as a static for easier management.
 	
 	
 	/* Load Method
-	 Searches for an existing array list of meals
-	 	If found: loads that array list as an object (loadTemp)
-	 	Casts it as an array list of meals
-	 	Hands that over to mlo
-	 	mlo sets loadTemp to existing meals array list variable
+	First, this method checks to see if anything exists at "C:\\Java\\Eclipse Workspace\\Meal Planner\\MealSaves.ser".
+	If something does this method loads statically from that location and casts the object as an ArrayList<Meal>.
+	Finally it calls the loadMealList in MealListHelper to transfer the array list.
+	
+	This method
+		returns: void
+		has as parameters: a MealListHelper
+		is called by: 
+			MealPlannerHelper's startUp method
 	 */
-	public void Load(MealList mlo) {
-		File savedMeals = new File("C:\\Java\\Eclipse Workspace\\Meal Planner\\MealSaves.ser"); // This is to find the file and checks if it exists.
+	public void Load(MealListHelper mlho) {
+		File savedMeals = new File(MEALARRAYLOCATION); // This is to find the file and checks if it exists.
 		if(savedMeals.exists() && !savedMeals.isDirectory()) {
 			try {
-				FileInputStream fileStream = new FileInputStream("C:\\Java\\Eclipse Workspace\\Meal Planner\\MealSaves.ser"); //This line actually gets the data out of the file. Hence why it needs a path.
+				FileInputStream fileStream = new FileInputStream(MEALARRAYLOCATION); //This line actually gets the data out of the file. Hence why it needs a path.
 				ObjectInputStream nos = new ObjectInputStream(fileStream);
 				Object one = nos.readObject(); // Holds the read object
 				@SuppressWarnings("unchecked")
 				/*Above line suppresses the warning for the line below. The warning exists because the compiler can't ever be sure that the object being cast is an ArrayList<Meal>. 
-				As the object should ALWAYS be a ArrayList<Meal> and research has shown is no better way to write the code(and the ide suggested this option). As such a suppressed warning is called for.
+				As the object should ALWAYS be a ArrayList<Meal> and research has shown there is no better way to write the code(and Eclipse suggested this option). As such a suppressed warning is called for.
 				*/
 				ArrayList<Meal> loadTemp = (ArrayList<Meal>) one; //Creates a ArrayList<Meal> variable to hold the loaded object and casts it as an ArrayList<Meal>
-				mlo.LoadMealList(loadTemp);
-				nos.close(); // Closing the file input stream
+				mlho.loadMealList(loadTemp);
+				nos.close(); // Closing the Object Input Stream
+				fileStream.close(); //Closing the File Input Stream
 			}
 			catch (Exception ex) {
 				ex.printStackTrace();
@@ -38,18 +48,24 @@ public class PersistenceBoundary implements Serializable {
 	
 	
 	/* Save Method
-	 get mealList
-	 saveMeals Method (passed array list mealList
-	 Saves meals to a txt doc
+	 This method saves the current meal list. The current plan is that whenever a change is made to MealListHelper's mealList this
+	 method is called automatically to persist the change.
+	 
+	 This method
+	 	returns: void
+	 	has parameters: MealListHelper
+	 	is called by:
+	 		MealPlannerHelper's mainMenu();
 	 */
 	
-	public void Save(MealList mlo) {
-		ArrayList<Meal> mealList = mlo.GetMealList();
+	public void Save(MealListHelper mlho) {
+		ArrayList<Meal> mealList = mlho.getMealList();
 		try {
-			FileOutputStream fs = new FileOutputStream("MealSaves.ser");
+			FileOutputStream fs = new FileOutputStream(MEALARRAYLOCATION);
 			ObjectOutputStream os = new ObjectOutputStream(fs);
 			os.writeObject(mealList);
 			os.close();
+			fs.close();
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();

@@ -1,35 +1,27 @@
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
-
-public class UserInterfaceBoundary implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+/* User Interface Boundary class
+ Holds all of the methods that interact with the user, whether that be through getting input or displaying output.
+ 
+ The next version is planned to be GUI based.
+ */
+public class UserInterfaceBoundary {
 	private static Scanner scanner = new Scanner(System.in);
 	
 	/* Display Main Menu
-	 new String input
-	 Says: "Welcome to Meal Planner. Please enter the number of what you would like to do next."
-	 	1. Create new meal.
-	 	2. Display list of all meals.
-	 	3. Delete a meal.
-	 	4. Edit a meal.
-	 	5. Create meal plan.
-	 	0. Exit program.
+	 Displays the main menu of the program.
 	 
-	 input = user input
-	 trim input to first character
-	 Return user input
+	 This method is called by 
+	 	MealPlannerHelper's MainMenu
 	 */
 	
-	public int DisplayMainMenu() {
+	public int displayMainMenu() {
 		System.out.println("Welcome to Meal Planner. Please enter the number of what you would like to do next.");
 		System.out.println("1 = Create new meal.");
 		System.out.println("2 = Display list of all meals.");
 		System.out.println("3 = Delete a meal.");
 		System.out.println("4 = Edit a meal.");
 		System.out.println("5 = Create a Meal Plan");
-		//System.out.println("5 = Create meal plan.");
 		System.out.println("0 = Exit");
 		while(!scanner.hasNextInt()) { // Checks to make sure the input is an int.
 			/* 
@@ -44,66 +36,87 @@ public class UserInterfaceBoundary implements Serializable {
 		int input = scanner.nextInt();
 				/*Notes on this scanner:
 				1. It accepts input and changes it to an int.
-				2. It JUST reads the number and not the end of the line. This can throw off upcoming inpus.
+				2. It JUST reads the number and not the end of the line. This can throw off upcoming inputs.
 				3. The Int part can be substituted for Double or Float etc.
 				*/
-		String sentence = scanner.nextLine(); //Used to read the remainder of the line after a scanner.nextInt(); . Feel like there should be a better variable name, but it works ok in this case.
+		scanner.nextLine(); //Used to read the remainder of the line after a scanner.nextInt(); 
 		return input;
 	}
 	
-	/* Generic Message method (string message)
-	 Display message
+	/* Generic Message
+	 Used for display error messages or anything else that would pop up in a new box. Probably unnecessary for a command line interface, but
+	 good practice to get used to for when the program switches to a GUI.
 	 
-	 Used for display error messages or anything else that would pop up in a new box.
-	 */
-	public void GenericMessage (String message) {
+	 This method is called by
+	 	UserInterfaceBoundary's createMealName
+	 	"" deleteMeal
+	 	"" displayMealList
+	 	"" editMeal
+	 	"" selection
+	 	MealPlannerHelper's mainMenu
+	*/
+	public void genericMessage (String message) {
 		System.out.println(message);
 	}
 	
 	
-	/*
-	Display Meal List Method
-	Get mealList size
-		if mealList size < 0
-			Display: There are no meals
-		else
-			get names from MealList
-			cycle through names and display them
+	/* Display Meal List
+	 Displays the names of all the meals in myMealList. If there are none it informs the user.
+	 
+	 This method is called by
+	 	MealPlannerHelper's mainMenu
+	 	UserInterfaceBoundary's selection
 	*/
 	
-	public void DisplayMealList (MealList mlo) {
-		if (mlo.GetmealListSize() == 0) {
-			GenericMessage("There are currently no meals.");
+	public void displayMealList (MealListHelper mlo) {
+		if (mlo.getmyMealListSize() == 0) {
+			genericMessage("There are currently no meals.");
 		}
 		else {
-			ArrayList<String> names = mlo.GetMealListNames();
+			ArrayList<String> names = mlo.getmyMealListNames();
 			for (int i = 0; i <names.size(); i++) {
-				System.out.println(i + 1 + ". " + names.get(i));
+				System.out.println((i + 1) + ". " + names.get(i));
 			}
 		}
 		System.out.println();
 	}
 	
-	//Creates a new meal. Get the information to fill the fields for a new meal first then create the meal and set those fields.
-	public void CreateMeal(MealList mlo) {
-		String name = CreateMealName(mlo);
+	/* Create Meal
+	 Creates a new meal.
+	 
+	 Currently each meal consists of only a name. There are plans to put in other fields like the meal's recipe and user tags later.
+	 
+	 Get the information to fill the fields for a new meal first then create the meal and set those fields.
+	 
+	 This method is called by
+	 	MealPlannerHelper's mainMenu
+	*/
+	public void createMeal(MealListHelper mlho) {
+		String name = createMealName(mlho);
 		Meal m = new Meal();
 		//Insert code to fill any other fields for a new meal here
 		m.setName(name);
 		//Insert code to set any other fields for m here
-		mlo.CreateNewMeal(m);
+		mlho.createNewMeal(m);
 	}
 	
-	public String CreateMealName (MealList mlo) {
+	/* Create Meal Name
+	 Walks the user through creating a name for the meal. Will check for empty fields as well as call methods to check for duplicate names.
+	 
+	 This method is called by
+	 	UserInterfaceBoundary's createMeal
+	 	"" editMeal
+	 */
+	public String createMealName (MealListHelper mlho) {
 		while (true) { //Java freaks out if you try to create a variable and set it to true and then make a loop. If you do it this way, so that the only way out of the while loop is a return statement, Java's cool.
 			System.out.println("Please enter a name for the meal.");
 			String name = scanner.nextLine();
 			if (name.isEmpty()) {
-				GenericMessage("That is not a valid name.");
+				genericMessage("That is not a valid name.");
 			}
 			else {
-				if (mlo.CheckDuplicateName(name) == true) {
-					GenericMessage("That name is already taken.");
+				if (mlho.checkDuplicateName(name) == true) {
+					genericMessage("That name is already taken.");
 				}
 				else {
 					return name;
@@ -113,42 +126,21 @@ public class UserInterfaceBoundary implements Serializable {
 	}
 	
 	
-	/* Delete Meal Method
-	if (mlo.GetmealListSize() == 0) {
-		GenericMessage("There are currently no meals.");
-	}
-	else {
-		leaveLoop = false
-		loop (while leaveLoop !true)
-			input = call Selection method
-			if input = 0
-				leaveLoop = true
-			else
-				loop
-					Display: You are about to delete (mlo.getMealName(passing input))
-					Display: Would you like to continue?
-					Get next line, Trim and force upper case
-					if "N"
-						break
-					else if "Y"
-						call mlo's DeleteMeal method passing input
-						Display: Delete successful.
-						leaveLoop = true
-						break
-					else
-						GenericMessage("That is not a valid choice.)
-	}
-	
+	/* Delete Meal
+	 Walks the user through deleting a meal from myMealList.
+	 
+	 This method is called by
+	 	MealPlannerHelper's mainMenu
 	*/
 	//Note: EditMeal and DeleteMeal are too similar and I should create and use common methods. Since I'm going to be switching to GUI soon I'm not going to worry about it now, but I should then.
-	public void DeleteMeal(MealList mlo) {
-		if (mlo.GetmealListSize() == 0) {
-			GenericMessage("There are currently no meals.");
+	public void deleteMeal(MealListHelper mlho) {
+		if (mlho.getmyMealListSize() == 0) {
+			genericMessage("There are currently no meals.");
 		}
 		else {
 			boolean leaveLoop = false;
-			while (leaveLoop == false) {
-			int input = Selection(mlo);
+			while (!leaveLoop) {
+			int input = selection(mlho);
 				if (input == 0) {
 					leaveLoop = true;
 				}
@@ -156,9 +148,8 @@ public class UserInterfaceBoundary implements Serializable {
 					input = input - 1; //This is to prevent the off by one error so the user can choose meal 1 and select it from element 0 in the array list.
 					   				   //Doing this any earlier would prevent the user from choosing 0 to escape.
 					while(true) {
-						System.out.println("You are about to delete " + (mlo.GetMealName(input)));
+						System.out.println("You are about to delete " + (mlho.getMealName(input)));
 						System.out.println("Would you like to continue? Y/N");
-						//String yn = scanner.nextLine().trim().substring(0, 1);
 						String yn = scanner.nextLine();
 						yn =  yn.trim();
 						yn = yn.toUpperCase();
@@ -167,13 +158,13 @@ public class UserInterfaceBoundary implements Serializable {
 							break;
 						}
 						else if (yn.equals("Y")) {
-							mlo.DeleteMeal(input);
+							mlho.deleteMeal(input);
 							System.out.println("Delete successful.");
 							leaveLoop = true;
 							break;
 						}
 						else {
-							GenericMessage("That is not a valid choice.");
+							genericMessage(yn + " is not a valid choice.");
 						}
 					}
 				}
@@ -181,28 +172,18 @@ public class UserInterfaceBoundary implements Serializable {
 		}
 	}
 	
-	/* Display Selection method
-	 loop
-	 	call DisplayMealList
-	 	display "Please type the number next to the meal you wish to delete, or type 0 to quit."
-	 	(I've got a way to get just numeric inputs. Still don't know how it is doing it.)
-	 	try
-	 		parse input into int
-	 	catch
-	 		GenericMessage (Please type a valid integer)
-	 		continue
-	 	if input > mlo.GetmealListSize()
-	 		GenericMessage (That meal does not exist.)
-	 		continue
-	 	if input < 0
-	 		GenericMessage (That meal does not exist.)
-	 		continue
-	 	return input
+	/* selection
+	 This method displays all the meals from myMealList and prompts the user to select one. It then hands the selected number back
+	 to the method that called it.
+	 
+	 This method is called by
+	 	UserInterfaceBoundary's deleteMeal
+	 	""	editMeal
 	 */
 	
-	public int Selection(MealList mlo) {
+	public int selection(MealListHelper mlho) {
 		while(true) {
-			DisplayMealList(mlo);
+			displayMealList(mlho);
 			System.out.println("Please type the number next to the meal you wish to select, or type 0 to quit");
 			while(!scanner.hasNextInt()) { // Checks to make sure the input is an int.
 				/* 
@@ -220,47 +201,32 @@ public class UserInterfaceBoundary implements Serializable {
 					2. It JUST reads the number and not the end of the line. This can throw off upcoming inpus.
 					3. The Int part can be substituted for Double or Float etc.
 					*/
-			if (input > mlo.GetmealListSize() || input < 0) {
-				GenericMessage ("That meal does not exist.");
+			if (input > mlho.getmyMealListSize() || input < 0) {
+				genericMessage ("That meal does not exist.");
 				continue;
 			}
-			String sentence = scanner.nextLine(); //Used to read the remainder of the line after a scanner.nextInt();
+			scanner.nextLine(); //Used to read the remainder of the line after a scanner.nextInt();
 			return input;
 		}
 	}
 	
 	/* Edit Meal Method
-	if (mlo.GetmealListSize() == 0) {
-		GenericMessage("There are currently no meals.");
-	}
-	else {
-		leaveLoop = false
-		loop (while leaveLoop !true)
-			input = call Selection method
-			if input = 0
-				leaveLoop = true
-			else
-				loop
-					Display: You are about to edit (mlo.getMealName(passing input))
-					Display: Would you like to continue?
-					Get next line, Trim and force upper case
-					if "N"
-						break
-					else if "Y"
-						name = call CreateMealName
-						call mlo's SetMealName passing name and input
-	
+	 This method walks the user through editing an existing meal. Currently the only field a meal has is it's name. This will change
+	 in future versions and so will this method.
+	 
+	 This method is called by
+	 	MealPlannerHelper's mainMenu
 	*/
 	
 	//Note: EditMeal and DeleteMeal are too similar and I should create and use common methods. Since I'm going to be switching to GUI soon I'm not going to worry about it now, but I should then.
-	public void EditMeal(MealList mlo) {
-		if (mlo.GetmealListSize() == 0) {
-			GenericMessage("There are currently no meals.");
+	public void editMeal(MealListHelper mlho) {
+		if (mlho.getmyMealListSize() == 0) {
+			genericMessage("There are currently no meals.");
 		}
 		else {
 			Boolean leaveLoop = false;
 			while(leaveLoop == false) {
-				int input = Selection(mlo);
+				int input = selection(mlho);
 				if(input == 0) {
 					leaveLoop = true;
 				}
@@ -268,7 +234,7 @@ public class UserInterfaceBoundary implements Serializable {
 					input = input - 1; //This is to prevent the off by one error so the user can choose meal 1 and select it from element 0 in the array list.
 									   //Doing this any earlier would prevent the user from choosing 0 to escape.
 					while(true) {
-						System.out.println("You are about to edit " + (mlo.GetMealName(input)));
+						System.out.println("You are about to edit " + (mlho.getMealName(input)));
 						System.out.println("Would you like to continue? Y/N");
 						String yn = scanner.nextLine().trim().substring(0, 1);
 						yn = yn.toUpperCase();
@@ -276,13 +242,13 @@ public class UserInterfaceBoundary implements Serializable {
 							break;
 						}
 						else if (yn.equals("Y")) {
-							String name = CreateMealName(mlo);
-							mlo.SetMealName(input, name);
+							String name = createMealName(mlho);
+							mlho.setMealName(input, name);
 							leaveLoop = true;
 							break;
 						}
 						else {
-							GenericMessage("That is not a valid choice.");
+							genericMessage("That is not a valid choice.");
 						}
 					}
 				}
@@ -292,42 +258,39 @@ public class UserInterfaceBoundary implements Serializable {
 	}
 
 	/* Meal Plan method
-	 Display: How many meals would you like to plan for? Or type 0 to exit. (input = mealAmmount)
-	 	If 0: Break
-	 	If invalid input: Display: that is not a valid input. Please try again.
-	 	If !0 and valid input:
-	 		Check if mealAmmount > mealList
-	 			if Y: 
-	 				Display: There are not enough meals. Please choose a smaller number.
-	 			if N:
-	 				ArrayList<Meal> mealPlan = mlo's CreateMealPlan method passing mealAmmount
-					for (int i = 0; i <mealPlan.size(); i++) {
-						System.out.println(i + 1 + ". " + names.get(i));
-					}
-		System.out.println();
+	 The method that actually plans out a random list of meals.
+	 
+	 The user has to input the number of meals they want to get. This is to allow a user who wants to plan more/less then a week. Or
+	 to plan for multiple meals in a week.
+	 
+	 This method checks for empty input, appropriate input (ie: no negative number of meals), and makes sure there are enough meals
+	 in myMealList to create a meal plan of the desired size.
+	 
+	 This method is called by:
+	 	MealPlannerHelper's mainMenu
 	 */
 	
-	public void MealPlan(MealList mlo) {
+	public void mealPlan(MealListHelper mlho) {
 		while(true) {
 			System.out.println("Type how many meals you would like to plan for or type 0 to exit.");
 			while(!scanner.hasNextInt()) { // Checks to make sure the input is an int.
 				scanner.next();
 				System.out.println("That is not a valid input. Please try again.");
 			}
-			int mealAmmount = scanner.nextInt();
-			String sentence = scanner.nextLine(); //Used to read the remainder of the line after a scanner.nextInt(); . Feel like there should be a better variable name, but it works ok in this case.
-			if (mealAmmount == 0) {
+			int mealAmount = scanner.nextInt();
+			scanner.nextLine(); //Used to read the remainder of the line after a scanner.nextInt(); . Feel like there should be a better variable name, but it works ok in this case.
+			if (mealAmount == 0) {
 				break;
 			}
-			else if (mealAmmount < 0) {
+			else if (mealAmount < 0) {
 				System.out.println("There are no such things as negative meals. Try again.");
 			}
 			else {
-				if (mealAmmount > mlo.GetmealListSize()) {
+				if (mealAmount > mlho.getmyMealListSize()) {
 					System.out.println("There are not enough meals to make a meal list of that size.");
 				}
 				else {
-					ArrayList<String> mealPlan = mlo.CreateMealPlan(mealAmmount);
+					ArrayList<String> mealPlan = mlho.CreateMealPlan(mealAmount);
 					for (int i = 0; i <mealPlan.size(); i++) {
 						System.out.println(i + 1 + ". " + mealPlan.get(i));
 					}
